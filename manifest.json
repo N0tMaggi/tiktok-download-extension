@@ -1,0 +1,39 @@
+{
+    "manifest_version": 3,
+    "name": "ag7-dev.de tiktok downloader",
+    "version": "1.872",
+    "description": "TikTok video downloader extension",
+    "icons": {
+        "128": "assets/safe.png"
+    },
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "scripting",
+        "storage",
+        "downloads"
+    ],
+    "host_permissions": [
+        "https://*.tiktok.com/*",
+        "https://api.ag7-dev.de/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "assets/safe.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://*.tiktok.com/*"
+            ],
+            "js": [
+                "logger.js",
+                "content.js"
+            ]
+        }
+    ]
+}
+

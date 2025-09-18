@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>TikTok Downloader</title>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --surface-color: #ffffff;
+            --text-color: #1f2933;
+            --muted-text: #6b7280;
+            --primary: #fe2c55;
+            --primary-hover: #e11e4a;
+            --secondary: #1f8f6a;
+            --secondary-hover: #16674c;
+            --border-color: #e5e7eb;
+            --status-info-bg: #e5f4ff;
+            --status-info-text: #0369a1;
+            --status-success-bg: #eafaf1;
+            --status-success-text: #116b45;
+            --status-error-bg: #fde8e8;
+            --status-error-text: #c81e1e;
+            --status-warning-bg: #fff8e1;
+            --status-warning-text: #92400e;
+            --terminal-bg: #10172a;
+            --terminal-header: #192038;
+            --terminal-border: rgba(15, 23, 42, 0.4);
+            --terminal-text: #e2e8f0;
+            --shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --surface-color: #111827;
+            --text-color: #f8fafc;
+            --muted-text: #94a3b8;
+            --primary: #fe2c55;
+            --primary-hover: #ff3b6b;
+            --secondary: #2dd4bf;
+            --secondary-hover: #14b8a6;
+            --border-color: #1e293b;
+            --status-info-bg: rgba(59, 130, 246, 0.18);
+            --status-info-text: #93c5fd;
+            --status-success-bg: rgba(34, 197, 94, 0.18);
+            --status-success-text: #86efac;
+            --status-error-bg: rgba(248, 113, 113, 0.18);
+            --status-error-text: #fca5a5;
+            --status-warning-bg: rgba(251, 191, 36, 0.18);
+            --status-warning-text: #fcd34d;
+            --terminal-bg: #020817;
+            --terminal-header: #0f172a;
+            --terminal-border: rgba(148, 163, 184, 0.18);
+            --terminal-text: #e2e8f0;
+            --shadow: 0 12px 32px rgba(2, 8, 23, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            width: 380px;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: var(--surface-color);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(254, 44, 85, 0.25);
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .theme-toggle {
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-color);
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            background: rgba(148, 163, 184, 0.16);
+        }
+
+        .status-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .status {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--text-color);
+            font-size: 14px;
+            line-height: 1.4;
+            display: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .status.loading {
+            display: block;
+            color: var(--muted-text);
+        }
+
+        .status.success {
+            display: block;
+            background: var(--status-success-bg);
+            color: var(--status-success-text);
+        }
+
+        .status.error {
+            display: block;
+            background: var(--status-error-bg);
+            color: var(--status-error-text);
+        }
+
+        .status.info {
+            display: block;
+            background: var(--status-info-bg);
+            color: var(--status-info-text);
+        }
+
+        .status.warning {
+            display: block;
+            background: var(--status-warning-bg);
+            color: var(--status-warning-text);
+        }
+
+        .cache-badge {
+            align-self: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.08);
+            font-size: 11px;
+            color: var(--muted-text);
+            border: 1px solid var(--border-color);
+            transition: opacity 0.2s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .card {
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted-text);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            background: var(--surface-color);
+            color: var(--text-color);
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="url"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(254, 44, 85, 0.15);
+        }
+
+        button.action {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            will-change: transform;
+        }
+
+        button.primary {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(254, 44, 85, 0.25);
+        }
+
+        button.primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background: var(--secondary);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(31, 143, 106, 0.25);
+        }
+
+        button.secondary:hover:not(:disabled) {
+            background: var(--secondary-hover);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loader {
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .terminal-container {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--terminal-border);
+        }
+
+        .terminal-header {
+            background: var(--terminal-header);
+            color: var(--terminal-text);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .terminal-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .terminal-btn {
+            border: none;
+            background: rgba(226, 232, 240, 0.16);
+            color: var(--terminal-text);
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.2s ease;
+        }
+
+        .terminal-btn:hover {
+            background: rgba(226, 232, 240, 0.32);
+        }
+
+        .terminal-content {
+            background: var(--terminal-bg);
+            color: var(--terminal-text);
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            padding: 12px;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .error-log { color: #f87171; }
+        .success-log { color: #4ade80; }
+        .warning-log { color: #facc15; }
+        .info-log { color: #93c5fd; }
+
+        .footer {
+            font-size: 12px;
+            color: var(--muted-text);
+            text-align: center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand">
+                <img src="assets/safe.png" alt="TikTok Icon" />
+                <h1>TikTok Downloader</h1>
+            </div>
+            <button id="themeToggle" class="theme-toggle" type="button">Dark</button>
+        </div>
+
+        <div class="status-row">
+            <div id="statusMessage" class="status"></div>
+            <span id="cacheBadge" class="cache-badge hidden">Cache: 0s</span>
+        </div>
+
+        <div id="manualEntry" class="card hidden">
+            <h2>Paste a TikTok link</h2>
+            <p>Not on TikTok? Drop a video or photo URL below to prepare the download.</p>
+            <div class="input-row">
+                <input type="url" id="manualUrlInput" placeholder="https://www.tiktok.com/@user/video/1234567890" autocomplete="off" />
+                <button id="manualFetchBtn" class="secondary action" type="button">Fetch</button>
+            </div>
+        </div>
+
+        <button id="downloadBtn" class="primary action" type="button">
+            <span id="btnLoader" class="loader" style="display: none;"></span>
+            <span id="btnText">Prepare Download</span>
+        </button>
+
+        <button id="downloadMusicBtn" class="secondary action" type="button">
+            <span id="musicBtnLoader" class="loader" style="display: none;"></span>
+            <span id="musicBtnText">Download Music</span>
+        </button>
+
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <span>Terminal</span>
+                <div class="terminal-actions">
+                    <button id="clearTerminal" class="terminal-btn" type="button">Clear</button>
+                    <button id="toggleTerminal" class="terminal-btn" type="button">Hide</button>
+                </div>
+            </div>
+            <div id="terminal" class="terminal-content"></div>
+        </div>
+
+        <div class="footer">
+            &copy; 2025 ag7-dev.de | v1.87
+        </div>
+    </div>
+    <script src="logger.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
+
