@@ -23,7 +23,7 @@ const TIKTOK_PATTERNS = [
   /https?:\/\/(www\.)?m\.tiktok\.com\/v\/\d+/
 ];
 
-const API_ENDPOINT = 'https://api.ag7-dev.de/v1/tiktok/tiktok.php';
+const API_ENDPOINT = 'https://api.maggi.dev/v1/tiktok/tiktok.php';
 
 const state = {
   phase: 'idle', // idle | fetching | ready | downloading

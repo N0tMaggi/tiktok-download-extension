@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "ag7-dev.de tiktok downloader",
+    "name": "maggi.dev tiktok downloader",
     "version": "1.872",
     "description": "TikTok video downloader extension",
     "icons": {
@@ -15,7 +15,7 @@
     ],
     "host_permissions": [
         "https://*.tiktok.com/*",
-        "https://api.ag7-dev.de/*"
+        "https://api.maggi.dev/*"
     ],
     "background": {
         "service_worker": "background.js"
